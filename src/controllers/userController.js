@@ -1,10 +1,23 @@
 import User from "../models/User.js";
 import catchAsync from "../utils/catchAsync.js";
+import AppError from "../utils/appError.js";
 
 export const getUsers = catchAsync(async (req, res) => {
   const users = await User.find();
   res.status(200).json({ status: "success", data: users });
 });
+
+/*----------------------------------------------------------- */
+
+export const getUserById = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+  res.status(200).json({ status: "success", data: user });
+});
+
+/*----------------------------------------------------------- */
 
 export const createUser = catchAsync(async (req, res) => {
   const { username, email, password } = req.body;
@@ -13,7 +26,9 @@ export const createUser = catchAsync(async (req, res) => {
   res.status(201).json({ status: "success", data: newUser });
 });
 
-export const updateUser = catchAsync(async (req, res) => {
+/*----------------------------------------------------------- */
+
+export const updateUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { username, email, password } = req.body;
 
@@ -24,17 +39,19 @@ export const updateUser = catchAsync(async (req, res) => {
   );
 
   if (!updatedUser) {
-    return res.status(404).json({ message: "User not found" });
+    return next(new AppError("No user found with that ID", 404));
   }
 
   res.status(200).json({ status: "success", data: updatedUser });
 });
 
-export const deleteUser = catchAsync(async (req, res) => {
+/*----------------------------------------------------------- */
+
+export const deleteUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const deletedUser = await User.findByIdAndDelete(id);
   if (!deletedUser) {
-    return res.status(404).json({ message: "User not found" });
+    return next(new AppError("No user found with that ID", 404));
   }
 
   res

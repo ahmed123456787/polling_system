@@ -1,13 +1,13 @@
 import express from "express";
 import userRouter from "./routes/userRoute.js";
-import errorHandler from "./utils/errorHandler.js";
+import globalErrorHandler from "./controllers/errorController.js";
 
 const app = express();
 
 app.use(express.json());
 app.use("/api", userRouter);
 
-// Error handler middleware
-app.use(errorHandler);
+// Global error handling middleware (must be after all routes)
+app.use(globalErrorHandler);
 
 export default app;
