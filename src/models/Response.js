@@ -11,7 +11,7 @@ const ResponseSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: false, 
+      required: false,
     },
     isAnonymous: {
       type: Boolean,
@@ -21,5 +21,6 @@ const ResponseSchema = new Schema(
   { timestamps: true }
 );
 
-const Response = mongoose.model("Response", ResponseSchema);
-module.exports = Response;
+const Answer = mongoose.model("Response", ResponseSchema);
+
+export default Answer;
