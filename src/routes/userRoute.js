@@ -6,8 +6,11 @@ import {
   updateUser,
   deleteUser,
 } from "../controllers/userController.js";
+import { login } from "../controllers/authController.js";
 
 const userRouter = Router();
+
+userRouter.post("/login", login);
 
 userRouter
   .get("/users", getUsers)
