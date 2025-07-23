@@ -1,6 +1,5 @@
 import Question from "../models/Question.js";
 import Poll from "../models/Poll.js";
-import { createOne } from "./factory.js";
 import catchAsync from "../utils/catchAsync.js";
 
 export const getQuestions = catchAsync(async (req, res) => {

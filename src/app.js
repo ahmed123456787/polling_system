@@ -8,6 +8,9 @@ import questionRouter from "./routes/questionRoute.js";
 const app = express();
 
 app.use(express.json());
+// Serve static files from the public directory
+app.use(express.static("public"));
+
 app.use("/api", userRouter);
 app.use("/api", responseRouter);
 app.use("/api", pollRouter);
