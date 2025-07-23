@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import validator from "validator";
 
 const ResponseSchema = new Schema(
   {
@@ -9,9 +10,13 @@ const ResponseSchema = new Schema(
       },
     ],
     user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
+      email: {
+        type: String,
+        required: function () {
+          return this.isAnonymous === false; // Only require email if not anonymous
+        },
+        validate: [validator.isEmail, "Please provide a valid email address"],
+      },
     },
     isAnonymous: {
       type: Boolean,

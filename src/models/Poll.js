@@ -13,7 +13,7 @@ const PollSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Question",
-      required: true,
+      default: [],
     },
   ],
   creator: {
@@ -21,13 +21,7 @@ const PollSchema = new Schema({
     ref: "User",
     required: true,
   },
-  responses: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Response",
-    },
-  ],
 });
 
 const Poll = mongoose.model("Poll", PollSchema);
-module.exports = Poll;
+export default Poll;

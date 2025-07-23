@@ -1,3 +1,4 @@
+import { response } from "express";
 import mongoose, { Schema } from "mongoose";
 
 const QuestionSchema = new Schema({
@@ -17,13 +18,19 @@ const QuestionSchema = new Schema({
     type: Number,
     default: 0,
   },
+  userCreated: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   responses: [
     {
       type: Schema.Types.ObjectId,
       ref: "Response",
+      default: [],
     },
   ],
 });
 
 const Question = mongoose.model("Question", QuestionSchema);
-module.exports = Question;
+export default Question;
