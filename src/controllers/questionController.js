@@ -5,15 +5,12 @@ import catchAsync from "../utils/catchAsync.js";
 
 export const getQuestions = catchAsync(async (req, res) => {
   const pollId = req.params.pollId;
-  const questions = await Question.find({ poll: pollId }).populate(
-    "poll",
-    "name description"
-  );
+  const poll = await Poll.findById(pollId).populate("questions");
 
   res.status(200).json({
     status: "success",
     data: {
-      questions,
+      questions: poll.questions,
     },
   });
 });

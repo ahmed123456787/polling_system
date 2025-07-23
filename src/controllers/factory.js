@@ -2,7 +2,7 @@ import catchAsync from "../utils/catchAsync.js";
 
 export const createOne = (Model) =>
   catchAsync(async (req, res) => {
-    await Model.create(req.body);
+    const doc = await Model.create(req.body);
 
     res.status(201).json({
       status: "success",

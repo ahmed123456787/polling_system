@@ -8,6 +8,13 @@ const sendErrorDev = (err, res) => {
       message: "Resource not found",
     });
   }
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      status: "fail",
+      message: "Token expired, please log in again",
+    });
+  }
+
   if (err.code === 11000) {
     return res.status(400).json({
       status: "fail",
