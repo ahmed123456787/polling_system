@@ -54,6 +54,9 @@
         text-align: center;
         font-style: italic;
       }
+      .response {
+        background-color: #f3e5f5;
+      }
       #message-input {
         width: 80%;
         padding: 8px;
@@ -76,6 +79,11 @@
       .disconnect:hover {
         background-color: #d32f2f;
       }
+      .poll-container {
+        margin-top: 20px;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+      }
     </style>
   </head>
   <body>
@@ -97,6 +105,17 @@
       </div>
 
       <div id="connection-status">Not connected</div>
+    </div>
+
+    <!-- New Poll Room Section -->
+    <div class="container">
+      <h3>Join Poll Room</h3>
+      <input type="text" id="poll-id" placeholder="Enter Poll ID" disabled />
+      <button class="button" id="join-poll-button" disabled>Join Poll</button>
+      <button class="button disconnect" id="leave-poll-button" disabled>
+        Leave Poll
+      </button>
+      <div id="poll-status">Not in any poll room</div>
     </div>
 
     <div class="container">
@@ -123,7 +142,14 @@
       const sendBtn = document.getElementById("send-button");
       const connectionStatus = document.getElementById("connection-status");
 
+      // Poll room elements
+      const pollIdInput = document.getElementById("poll-id");
+      const joinPollBtn = document.getElementById("join-poll-button");
+      const leavePollBtn = document.getElementById("leave-poll-button");
+      const pollStatus = document.getElementById("poll-status");
+
       let socket = null;
+      let currentPollId = null;
 
       // Connect to Socket.IO server
       connectBtn.addEventListener("click", () => {
@@ -144,6 +170,8 @@
             disconnectBtn.disabled = false;
             messageInput.disabled = false;
             sendBtn.disabled = false;
+            pollIdInput.disabled = false;
+            joinPollBtn.disabled = false;
 
             addMessage("Connected to server", "status");
           });
@@ -170,6 +198,11 @@
             addMessage(message, "received");
           });
 
+          // Listen for new responses
+          socket.on("newResponse", (response) => {
+            addMessage(`New Response: ${JSON.stringify(response)}`, "response");
+          });
+
           // Connection closed
           socket.on("disconnect", () => {
             connectionStatus.textContent = "Disconnected from server";
@@ -180,6 +213,12 @@
             disconnectBtn.disabled = true;
             messageInput.disabled = true;
             sendBtn.disabled = true;
+            pollIdInput.disabled = true;
+            joinPollBtn.disabled = true;
+            leavePollBtn.disabled = true;
+            currentPollId = null;
+            pollStatus.textContent = "Not in any poll room";
+            pollStatus.style.color = "";
 
             addMessage("Disconnected from server", "status");
           });
@@ -196,6 +235,9 @@
             disconnectBtn.disabled = true;
             messageInput.disabled = true;
             sendBtn.disabled = true;
+            pollIdInput.disabled = true;
+            joinPollBtn.disabled = true;
+            leavePollBtn.disabled = true;
           });
         } catch (error) {
           connectionStatus.textContent = `Error: ${error.message}`;
@@ -208,6 +250,42 @@
         if (socket) {
           socket.disconnect();
         }
+      });
+
+      // Join a poll room
+      joinPollBtn.addEventListener("click", () => {
+        const pollId = pollIdInput.value.trim();
+        if (!socket || !socket.connected || !pollId) return;
+
+        // Leave current poll room if any
+        if (currentPollId) {
+          socket.emit("leavePoll", currentPollId);
+        }
+
+        // Join new poll room
+        socket.emit("joinPoll", pollId);
+        currentPollId = pollId;
+
+        pollStatus.textContent = `Joined poll: ${pollId}`;
+        pollStatus.style.color = "green";
+        leavePollBtn.disabled = false;
+        joinPollBtn.disabled = true;
+
+        addMessage(`Joined poll room: ${pollId}`, "status");
+      });
+
+      // Leave a poll room
+      leavePollBtn.addEventListener("click", () => {
+        if (!socket || !socket.connected || !currentPollId) return;
+
+        socket.emit("leavePoll", currentPollId);
+        addMessage(`Left poll room: ${currentPollId}`, "status");
+
+        currentPollId = null;
+        pollStatus.textContent = "Not in any poll room";
+        pollStatus.style.color = "";
+        leavePollBtn.disabled = true;
+        joinPollBtn.disabled = false;
       });
 
       // Send message

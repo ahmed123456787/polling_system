@@ -16,6 +16,8 @@ try {
 
   // Initialize WebSocket server
   import("./webSocket.js").then((module) => {
+    const { initWebSocket } = module;
+    const io = initWebSocket(server);
     console.log("WebSocket server initialized");
   });
 
